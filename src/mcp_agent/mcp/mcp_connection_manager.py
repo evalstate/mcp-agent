@@ -15,7 +15,7 @@ from anyio import Event, create_task_group, Lock
 from anyio.abc import TaskGroup
 from anyio.streams.memory import MemoryObjectReceiveStream, MemoryObjectSendStream
 
-from mcp import ClientSession
+from mcp import ClientSession, stdio_client
 from mcp.client.stdio import (
     StdioServerParameters,
     get_default_environment,
@@ -26,7 +26,6 @@ from mcp.types import JSONRPCMessage
 
 from mcp_agent.config import MCPServerSettings
 from mcp_agent.logging.logger import get_logger
-from mcp_agent.mcp.stdio import stdio_client_with_rich_stderr
 
 if TYPE_CHECKING:
     from mcp_agent.mcp_server_registry import InitHookCallable, ServerRegistry
@@ -220,7 +219,8 @@ class MCPConnectionManager:
                     env={**get_default_environment(), **(config.env or {})},
                 )
                 # Create stdio client config with redirected stderr
-                return stdio_client_with_rich_stderr(server_params)
+                # return stdio_client_with_rich_stderr(server_params) ## REMOVED TO ISOLATE SDK
+                return stdio_client(server_params)
             elif config.transport == "sse":
                 return sse_client(config.url)
             else:
